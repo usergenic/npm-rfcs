@@ -4,6 +4,11 @@
 
 There is a class of package, which has implicitly depends on being the only version present in a given environment.  This is most frequent in a browser context, where a package may participate in one or more global namespaces, such as attaching objects or wrapping methods on objects like `window` or `document`, calling `customElements.define()` and polyfilling platform features.  In non-browser contexts this matters too, when packages are use frameworks with package-wide scope, such as `mocha`.  When multiple versions of these "singleton" packages are installed, due to incompatible version specifications in the dependency graph, the consequences are no
 
+Existing discussions:
+- https://github.com/arcanis/build-pnm/issues/1
+- https://github.com/package-community/discussions/issues/3
+- https://github.com/npm/npm/issues/20185
+
 ## Motivation
 
 {{Why are we doing this? What pain points does this resolve? What use cases does it support? What is the expected outcome? Use real, concrete examples to make your case!}}
