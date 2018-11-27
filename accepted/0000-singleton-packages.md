@@ -23,7 +23,7 @@ Existing discussions:
 A `package.json` for a Singleton Package would include a single property `"singleton": true`, informing the package installer (`npm`) to permit installation of only one instance in the tree.
 If the dependency graph can not automatically resolve the package to a single version, installation would fail with a list of version conflicts and explicit resolutions would need to be made.
 
-A mechanism for defining Singleton Package resolutions which integrates reasonably well with the philosophy of node module resolution is to prioritize dependencies expressed at shallower levels of the graph tree over deeper levels, with highest precedence given to the top-level or "root" package.  This could aleviate the need for adding a special-purpose dependency resolutions list property in the package file and supports delegation of the dependency resolutions to sub-packages for addressing common arrangements.
+A mechanism for defining Singleton Package resolutions which integrates reasonably well with the philosophy of node module resolution is to prioritize dependencies expressed at shallower levels of the graph over those at deeper levels, enabling full control at the top-level or "root" package.  This aleviates the need for adding anything like a special-purpose dependency `resolutions` property in the package file and supports delegation of resolutions where they are better understood, by package authors which expressed dependencies in the first.
 
 Consider the following set of packages, *all* of which are defined as Singleton Packages:
 
