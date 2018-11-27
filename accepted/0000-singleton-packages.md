@@ -2,20 +2,50 @@
 
 ## Summary
 
-There is a class of package, which has implicitly depends on being the only version present in a given environment.  This is most frequent in a browser context, where a package may participate in one or more global namespaces, such as attaching objects or wrapping methods on objects like `window` or `document`, calling `customElements.define()` and polyfilling platform features.  In non-browser contexts this matters too, when packages are use frameworks with package-wide scope, such as `mocha`.  When multiple versions of these "singleton" packages are installed, due to incompatible version specifications in the dependency graph, the consequences are no
+A Singleton Package is a package which depends on having only one instance of itself present in the package tree.  Add support for a flag property in `package.json` to identify Singleton Packages.
+
+## Motivation
+
+There are many situations where packages have implicit requirement to be the sole instance in the package tree:
+ - Polyfills, which typically extend or wrap global methods and objects
+ - Packages that wire global properties or methods onto to `window` or `document`
+ - Packages that make use of implicit global registries such as `CustomElementsRegistry`
+ - Frameworks which establish global concerns such as `mocha`, `react` or `angular`
+ - Libraries which make use of `instanceof` in objects transacted by their public API
 
 Existing discussions:
 - https://github.com/arcanis/build-pnm/issues/1
 - https://github.com/package-community/discussions/issues/3
 - https://github.com/npm/npm/issues/20185
 
-## Motivation
-
-{{Why are we doing this? What pain points does this resolve? What use cases does it support? What is the expected outcome? Use real, concrete examples to make your case!}}
-
 ## Detailed Explanation
 
-{{Describe the expected changes in detail, }}
+A `package.json` for a Singleton Package would include a single property `"singleton": true`, informing the package installer (`npm`) to permit installation of only one instance in the tree.
+If the dependency graph can not automatically resolve the package to a single version, installation would fail with a list of version conflicts and explicit resolutions would need to be made.
+
+A mechanism for defining Singleton Package resolutions which integrates reasonably well with the philosophy of node module resolution is to prioritize dependencies expressed at shallower levels of the graph tree over deeper levels, with highest precedence given to the top-level or "root" package.  This could aleviate the need for adding a special-purpose dependency resolutions list property in the package file and supports delegation of the dependency resolutions to sub-packages for addressing common arrangements.
+
+Consider the following set of packages, *all* of which are defined as Singleton Packages:
+
+| Package | Version | Dependencies             |
+| ------- | ------- | ------------------------ |
+| my-app  | 1.0.0   | lib-a@1.0.0, lib-b@2.0.0 |
+| lib-a   | 1.0.0   | lib-b@1.0.0, lib-d@1.0.0 |
+| lib-b   | 1.0.0   | lib-c@1.0.0              |
+| lib-b   | 2.0.0   | lib-c@2.0.0              |
+| lib-c   | 1.0.0   | lib-d@1.0.0              |
+| lib-c   | 2.0.0   | lib-d@2.0.0              |
+| lib-d   | 1.0.0   |                          |
+| lib-d   | 2.0.0   |                          |
+
+A breadth-first traversal of the graph from the root `my-app@1.0.0` towards leaf nodes provides the following resolutions:
+
+| Package | Version | Resolved by   |
+| ------- | ------- | ------------- |
+| lib-a   | 1.0.0   | my-app@1.0.0  |
+| lib-b   | 2.0.0   | my-app@1.0.0  |
+| lib-c   | 2.0.0   | lib-b@2.0.0   |
+| lib-d   | 1.0.0   | lib-a@1.0.0   |
 
 ## Rationale and Alternatives
 
