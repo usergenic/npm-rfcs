@@ -2,12 +2,11 @@
 
 ## Summary
 
-Provide a mechanism to specify a substitute package/version for any package/version in the package graph to be honored at install-time.
-Sometimes there's a package in the dependency graph which needs to be replaced by a patched or alternate version. 
+Sometimes there's a transitive dependency in the graph which needs to be replaced by a patched or alternate version. Provide a mechanism to *remap* a package/version for *any* other package/version recursively in the package graph.  This would be honored at install-time, such that only the remapped version would be fetched and installed.
 
 ## Motivation
 
-{{Why are we doing this? What pain points does this resolve? What use cases does it support? What is the expected outcome? Use real, concrete examples to make your case!}}
+There are 
 
 ## Detailed Explanation
 
