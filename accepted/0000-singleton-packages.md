@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add a step to the graph analysis phase of `npm install` that causes it to fail when unable to resolve certain packages to a single instance/version due to  semver constraints.
+Add a step to the graph analysis phase of `npm install` that causes it to fail when unable to resolve certain packages to a single instance/version due to semver constraints.  Would be best if this could happen prior to package downloads, if there's an index-fetch only
 
 ## Motivation
 
@@ -37,21 +37,21 @@ Continuing from *Detailed Explanation*, consider the following session when runn
 
 ```
 $ npm install
-npm ERR! Incompatible singleton dependencies @webcomponents/webcomponentsjs
-npm ERR!   some-package@2.1.0 -> ^1.0.0
-npm ERR!   other-package@0.9.0 -> ^2.0.0
+npm ERR! Singleton dependency conflict(s)...
+npm ERR!   @webcomponents/webcomponentsjs@^1.0.0 in some-package@2.1.0
+npm ERR!   @webcomponents/webcomponentsjs@^2.0.0 in other-package@0.9.0
 
 npm ERR! A complete log of this run can be found in:
 npm ERR!     C:\Users\usergenic\AppData\Roaming\npm-cache\_logs\2018-11-28T10_40_07_124Z-debug.log
 ```
 
-I can clearly see that I have two packages `some-package@2.1.0` and `other-package@0.9.0` which each have semver incompatible dependencies on `@webcomponents/webcomponentsjs`.  I now know the nature of the problem I am dealing with.
+I can clearly see here that `@webcomponents/webcomponentjs` is a dependency of two packages, `some-package@2.1.0` and `other-package@0.9.0` which each have mutually exclusive semver constraints.  I now know the nature of the problem I am dealing with and can work towards resolving it.
 
 ## Prior Art
 
-I am unaware of package managers which define packages as singleton packages conditionally.  Many package systems assume that everything is a singleton or that there is no such thing.  In package systems which assume everything is singleton, there are often override measures to support manual resolution of conflicts.
+I am unaware of package managers which define only some packages as singleton packages.  Most package systems assume that everything is a singleton or that nothing is.  In package systems which assume everything is singleton, there are often override measures to support manual resolution of conflicts.
 
-In the node ecosystem,  `yarn install --flat` attempts to flatten the tree of a node package's dependencies on installation, using a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions) property to override conflicting versions.
+In the node ecosystem,  `yarn install --flat` attempts to flatten the tree of a node package's dependencies on installation, using a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions) property to override conflicting versions.  The problem that Singleton Packages is trying to solve is essentially to be able to perform a flat installtion only for those packages that truly need it and can support it.
 
 ## Unresolved Questions and Bikeshedding
 
