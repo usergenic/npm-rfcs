@@ -17,7 +17,7 @@ There are many situations where packages have implicit requirement to be the sol
 
 Any package which needs to ensure its uniqueness in the package tree would indicate so in its `package.json`, likely  `{"singleton": true}`, informing the install command to permit installation of only one instance in the entire tree.  If unable to resolve to a solitary version, due to semver constraints, installation would fail, providing a list of version conflicts and prompt with details about options for resolving the conflict.
 
-A new feature for resolving version conflicts is neither part of this RFC nor a pre-requisite of it.
+A new feature for resolving version conflicts is neither part of this RFC nor a pre-requisite of it, but is an anticipated need.  See [Prior Art](#Prior%20Art) for more.
 
 ## Rationale and Alternatives
 
@@ -25,7 +25,7 @@ A failure during installation will be much easier to identify and troubleshoot t
 
 Building this into the `npm` tool will protect the entire community of npm users from issues arising from version conflicts in singleton packages than deferring to opt-in packages/plugins.
 
-Existing discussions:
+Existing relevant discussions on the topic:
 
 - https://github.com/npm/npm/issues/20185
 - https://github.com/package-community/discussions/issues/3
@@ -49,9 +49,13 @@ I can clearly see here that `@webcomponents/webcomponentjs` is a dependency of t
 
 ## Prior Art
 
-I am unaware of package managers which define only some packages as singleton packages.  Most package systems assume that everything is a singleton or that nothing is.  In package systems which assume everything is singleton, there are often override measures to support manual resolution of conflicts.
+Most package systems either assume everything is a singleton or nothing is.  In package systems which assume everything is singleton, there are *sometimes* override measures to support manual resolution of conflicts, but not always.  So while there is not prior art I can point to for the self-identifying singleton package, there is plenty of precedent for working around the problem of singleton conflicts and the need for supporting singletons.
 
-In the node ecosystem,  `yarn install --flat` attempts to flatten the tree of a node package's dependencies on installation, using a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions) property to override conflicting versions.  The problem that Singleton Packages is trying to solve is essentially to be able to perform a flat installtion only for those packages that truly need it and can support it.
+[Bower](https://bower.io/) is an example of a package manager that installs everything as singletons and uses a [resolutions](https://github.com/bower/spec/blob/master/json.md#resolutions) map to direct the installer.
+
+[Yarn](https://yarnpkg.com) which is a Node package manager, has a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions)  map as well, originally for addressing conflicting dependencies only in `yarn install --flat` installations.  However, it has since been extended to support [selective resolutions](https://github.com/yarnpkg/rfcs/blob/master/implemented/0000-selective-versions-resolutions.md), enabling singleton installation of *some* packages while using traditional package tree layout for other node modules. to override conflicting versions.
+
+[Bundler](https://bundler.io) for Ruby has been debating an override/resolutions feature for at least 7 years. [Current RFC](https://github.com/bundler/rfcs/pull/13)
 
 ## Unresolved Questions and Bikeshedding
 
